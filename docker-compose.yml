@@ -1,0 +1,26 @@
+﻿services:
+  api:
+    image: cqrssample.api
+    build:
+      context: .
+      dockerfile: src/CqrsSample.Api/Dockerfile
+    ports:
+      - "9467:8080"
+    environment:
+        ASPNETCORE_ENVIRONMENT: Development
+        ConnectionStrings__DefaultConnection: "Host=database;Port=1997;Database=cqrs_sample;Username=postgres;Password=postgres"
+    depends_on:
+      - database
+  
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cqrs_sample
+    ports:
+      - "1997:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
